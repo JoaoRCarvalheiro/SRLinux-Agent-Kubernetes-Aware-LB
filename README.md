@@ -1,4 +1,4 @@
-# Nokia SR Linux Kubernetes Anycast Lab - Metallb in L2 Mode
+# Nokia SR Linux agent to implement Kubernetes aware load balancing in data centers
 
 In this lab we will explore a topology consisting of a Leaf/Spine [SR Linux](https://learn.srlinux.dev/) Fabric connected to a Kubernetes Cluster.
 
