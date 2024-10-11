@@ -1,0 +1,13 @@
+srkubeloadbalance:
+   #run-as-user: root
+   path: /etc/opt/srlinux/appmgr/user_agents/
+   launch-command: /usr/local/bin/srkubeloadbalance.sh
+   search-command: /bin/bash /usr/local/bin/srkubeloadbalance.sh
+   wait-for-config: No
+   failure-threshold: 100
+   failure-action: wait=1
+   yang-modules:
+       names: 
+           - "srkubeloadbalance"
+       source-directories:
+           - "/opt/srlinux/models/srl_nokia/models"

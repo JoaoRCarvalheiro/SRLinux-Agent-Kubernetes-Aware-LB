@@ -1,0 +1,136 @@
+name: srlk8s
+prefix: ""
+
+topology:
+  kinds:
+    srl:
+      image: ghcr.io/nokia/srlinux:latest
+      type: ixrd2l
+    linux:
+      image: jrcarv/thesis-setup:latest
+
+  nodes:
+    ### fabric ###
+    leaf1:
+      kind: srl
+      binds:
+        - /home/nokia/.kube/config:/home/nokia/.kube/config:rw
+        - /home/nokia/.minikube:/home/nokia/.minikube:rw
+        - /home/nokia/Documents/Carvalheiro/DCFPartnerHackathon/srl-k8s-anycast-lab/clab-srlk8s/.tls/ca/ca.pem:/ca.pem:rw
+        - /home/nokia/Documents/Carvalheiro/DCFPartnerHackathon/srl-k8s-anycast-lab/srkubeloadbalance.py:/etc/opt/srlinux/appmgr/user_agents/srkubeloadbalance.py:rw
+        - /home/nokia/Documents/Carvalheiro/DCFPartnerHackathon/srl-k8s-anycast-lab/srkubeloadbalance.yml:/etc/opt/srlinux/appmgr/srkubeloadbalance.yml:rw
+        - /home/nokia/Documents/Carvalheiro/DCFPartnerHackathon/srl-k8s-anycast-lab/srkubeloadbalance.sh:/usr/local/bin/srkubeloadbalance.sh:rw     
+      startup-config: configs/leaf1.conf
+    leaf2:
+      kind: srl
+      binds:
+        - /home/nokia/.kube/config:/home/nokia/.kube/config:rw
+        - /home/nokia/.minikube:/home/nokia/.minikube:rw
+        - /home/nokia/Documents/Carvalheiro/DCFPartnerHackathon/srl-k8s-anycast-lab/clab-srlk8s/.tls/ca/ca.pem:/ca.pem:rw
+        - /home/nokia/Documents/Carvalheiro/DCFPartnerHackathon/srl-k8s-anycast-lab/srkubeloadbalance.py:/etc/opt/srlinux/appmgr/user_agents/srkubeloadbalance.py:rw
+        - /home/nokia/Documents/Carvalheiro/DCFPartnerHackathon/srl-k8s-anycast-lab/srkubeloadbalance.yml:/etc/opt/srlinux/appmgr/srkubeloadbalance.yml:rw
+        - /home/nokia/Documents/Carvalheiro/DCFPartnerHackathon/srl-k8s-anycast-lab/srkubeloadbalance.sh:/usr/local/bin/srkubeloadbalance.sh:rw     
+      startup-config: configs/leaf2.conf
+    leaf3:
+      kind: srl
+      binds:
+        - /home/nokia/.kube/config:/home/nokia/.kube/config:rw
+        - /home/nokia/.minikube:/home/nokia/.minikube:rw
+        - /home/nokia/Documents/Carvalheiro/DCFPartnerHackathon/srl-k8s-anycast-lab/clab-srlk8s/.tls/ca/ca.pem:/ca.pem:rw
+        - /home/nokia/Documents/Carvalheiro/DCFPartnerHackathon/srl-k8s-anycast-lab/srkubeloadbalance.py:/etc/opt/srlinux/appmgr/user_agents/srkubeloadbalance.py:rw
+        - /home/nokia/Documents/Carvalheiro/DCFPartnerHackathon/srl-k8s-anycast-lab/srkubeloadbalance.yml:/etc/opt/srlinux/appmgr/srkubeloadbalance.yml:rw
+        - /home/nokia/Documents/Carvalheiro/DCFPartnerHackathon/srl-k8s-anycast-lab/srkubeloadbalance.sh:/usr/local/bin/srkubeloadbalance.sh:rw     
+      startup-config: configs/leaf3.conf
+    leaf4:
+      kind: srl
+      binds:
+        - /home/nokia/.kube/config:/home/nokia/.kube/config:rw
+        - /home/nokia/.minikube:/home/nokia/.minikube:rw
+        - /home/nokia/Documents/Carvalheiro/DCFPartnerHackathon/srl-k8s-anycast-lab/clab-srlk8s/.tls/ca/ca.pem:/ca.pem:rw
+        - /home/nokia/Documents/Carvalheiro/DCFPartnerHackathon/srl-k8s-anycast-lab/srkubeloadbalance.py:/etc/opt/srlinux/appmgr/user_agents/srkubeloadbalance.py:rw
+        - /home/nokia/Documents/Carvalheiro/DCFPartnerHackathon/srl-k8s-anycast-lab/srkubeloadbalance.yml:/etc/opt/srlinux/appmgr/srkubeloadbalance.yml:rw
+        - /home/nokia/Documents/Carvalheiro/DCFPartnerHackathon/srl-k8s-anycast-lab/srkubeloadbalance.sh:/usr/local/bin/srkubeloadbalance.sh:rw     
+      startup-config: configs/leaf4.conf
+    spine1:
+      kind: srl
+      type: ixrd3l
+      startup-config: configs/spine1.conf
+    spine2:
+      kind: srl
+      type: ixrd3l
+      startup-config: configs/spine2.conf
+
+    ### minikube cluster ###
+    
+    worker:
+      kind: ext-container
+      exec:
+        - ip address add 192.168.1.11/24 dev eth1
+        - ip route add 192.168.0.0/16 via 192.168.1.1
+    worker-m02:
+      kind: ext-container
+      exec:
+        - ip address add 192.168.1.12/24 dev eth1
+        - ip route add 192.168.0.0/16 via 192.168.1.1
+    worker-m03:
+      kind: ext-container
+      exec:
+        - ip address add 192.168.1.13/24 dev eth1
+        - ip route add 192.168.0.0/16 via 192.168.1.1
+    worker-m04:
+      kind: ext-container
+      exec:
+        - ip address add 192.168.1.14/24 dev eth1
+        - ip route add 192.168.0.0/16 via 192.168.1.1
+
+    ####  clients ###
+    client1:
+      kind: linux
+      binds:
+        - configs/client-config.sh:/client-config.sh
+      exec:
+        - bash /client-config.sh 192.168.2.11
+    client2:
+      kind: linux
+      binds:
+        - configs/client-config.sh:/client-config.sh
+      exec:
+        - bash /client-config.sh 192.168.2.12
+    client3:
+      kind: linux
+      binds:
+        - configs/client-config.sh:/client-config.sh
+        - test_ecmp.py:/test_ecmp.py
+      exec:
+        - bash /client-config.sh 192.168.2.13
+    client4:
+      kind: linux
+      binds:
+        - configs/client-config.sh:/client-config.sh
+        - test_ecmp1.py:/test_ecmp.py
+      exec:
+        - bash /client-config.sh 192.168.2.14
+
+  links:
+    ### #### fabric ### ####
+    - endpoints: ["spine1:e1-1", "leaf1:e1-49"]
+    - endpoints: ["spine1:e1-2", "leaf2:e1-49"]
+    - endpoints: ["spine1:e1-3", "leaf3:e1-49"]
+    - endpoints: ["spine1:e1-4", "leaf4:e1-49"]
+
+    - endpoints: ["spine2:e1-1", "leaf1:e1-50"]
+    - endpoints: ["spine2:e1-2", "leaf2:e1-50"]
+    - endpoints: ["spine2:e1-3", "leaf3:e1-50"]
+    - endpoints: ["spine2:e1-4", "leaf4:e1-50"]
+
+    #### minikube ####
+    - endpoints: ["leaf1:e1-1", "worker:eth1"]
+    - endpoints: ["leaf2:e1-1", "worker-m02:eth1"]
+    - endpoints: ["leaf3:e1-1", "worker-m03:eth1"]
+    - endpoints: ["leaf3:e1-3", "worker-m04:eth1"]
+
+    #### clients ####
+    - endpoints: ["client1:eth1", "leaf1:e1-2"]
+    - endpoints: ["client2:eth1", "leaf2:e1-2"]
+    - endpoints: ["client3:eth1", "leaf4:e1-3"]
+    - endpoints: ["client4:eth1", "leaf4:e1-2"]
