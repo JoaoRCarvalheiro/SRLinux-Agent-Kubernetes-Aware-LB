@@ -1,16 +1,14 @@
 # Nokia SR Linux agent to implement Kubernetes aware load balancing in data centers
 
-In this lab we will explore a topology consisting of a Leaf/Spine [SR Linux](https://learn.srlinux.dev/) Fabric connected to a Kubernetes Cluster.
+This repository contains the implementation of the method of load balancing for data centers presented in the master thesis “SR Linux agent for Kubernetes load balancing on data center fabrics” from João Carvalheiro.
 
-Our k8s Cluster will feature [MetalLB](https://metallb.universe.tf/), which is a load-balancer implementation for bare metal clusters. This will unlock the possibility to have **anycast** services in the SR Linux fabric.
+This contains the code of the SR Linux agent and the setup files for the lab environment where it was tested.
 
-To deploy this lab we will use [Containerlab](https://containerlab.dev/) which help us to effortlessly create complex network topologies and validate features, scenarios... And also, [Minikube](https://minikube.sigs.k8s.io/) which is an open-source tool that facilitates running Kubernetes clusters locally to quickly test and experiment with containerized applications.
+To deploy the test environment we use [Containerlab](https://containerlab.dev/) which help us to effortlessly create complex network topologies and validate features, scenarios. We also use [Minikube](https://minikube.sigs.k8s.io/) which is an open-source tool that facilitates running Kubernetes clusters locally to quickly test and experiment with containerized applications. Our k8s Cluster will feature [MetalLB](https://metallb.universe.tf/), which gives bare metal clusters the mechanism to assign external IPs to LoadBalancer type Kubernetes services.
 
-The end service we will use on top of the kubernetes cluster is a Nginx HTTP echo server. This service will be deployed and exposed in all the k8s nodes. With simulated clients, we will verify how traffic is distributed among the different nodes/pods.
+The end service we will use on top of the kubernetes cluster is a Nginx HTTP echo server. This service will be deployed and exposed in all the k8s nodes. 
 
-This lab. is using metallb in L2 Mode. Static routes are programmed in each ToR switch targeting the Metallb service IPs. The Next-Hops of the static routes are the worker node interfaces.
-
-The following diagram represent the physical an logical topology.
+The following diagram represents the physical and logical topology.
 
 ## Topology
 
