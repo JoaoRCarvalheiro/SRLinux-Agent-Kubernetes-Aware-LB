@@ -40,27 +40,33 @@ Demonstrate kubernetes MetalLB load balancing in L2 Mode using a Containerlab+Mi
 ## Deploying the lab
 
 ```bash
-cd DCFPartnerHackathon/srl-k8s-anycast-lab
-```
-
-```bash
 # deploy minikube cluster
-minikube start --nodes 4 -p cluster1
-```
-
-```bash
-# deploy containerlab topology
-clab deploy --topo srl-k8s-lab.clab.yml
+minikube start --apiserver-ips=172.20.20.1 --nodes 4 -p worker
 ```
 
 ```bash
 # enable MetalLB addons
-minikube addons enable metallb -p cluster1
+minikube addons enable metallb -p worker
 ```
 
 ```bash
 # install MetalLB (native mode l2advertisement)
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.12/config/manifests/metallb-native.yaml
+```
+
+```bash
+# change the API server information in the config file of Kubernetes (/.kube/config) to the one you are going to setup the port forward to
+server: https://172.20.20.1:49153
+```
+
+```bash
+# on a different terminal setup the port forwarding
+kubectl port-forward --address 172.20.20.1 kube-apiserver-cluster1 49153:8443 --namespace kube-system
+```
+
+```bash
+# deploy containerlab topology
+clab deploy --reconfigure -t srl-k8s-lab.clab.yml
 ```
 
 ```bash
@@ -73,52 +79,32 @@ kubectl apply -f metallb.yaml
 kubectl apply -f nginx.yaml
 ```
 
-## Tests
+## Load Balancing Tests
 
 ```bash
-# check underlay sessions in Spine, leaf switches
-A:spine1$ show network-instance default protocols bgp neighbor
+# enter one of the clients sh shell
+docker exec -it client3 /bin/sh
 
-# check the static route is up on all the leaf switches
-A:leaf2$ show network-instance ip-vrf-1 protocols bgp neighbor
+# enter virtual enviroment
+. /app/venv/bin/activate
 
-# check kubernetes status
-kubectl get nodes -o wide
+# run the script
+python3 test_ecmp.py
+```
 
-kubectl get pods -o wide
+This will generate a list of the number of requests answered by each pod.
 
-kubectl get svc
+## Performance Tests
+Create a deployment named 'nginxhello' and run one of the these scripts.
 
-# check MetalLB BGP speaker pods in kubernetes nodes
-kubectl get pods -A | grep speaker
+```bash
+# test that measures the time that the network takes to react to an increase in the number of pods
+python3 c_add.py
+```
 
-# connect to MetalLB speaker pod
-# change speaker-4gcj8 with the name of one of the speakers
-kubectl exec -it speaker-4gcj8 --namespace=metallb-system -- vtysh
-
-# verify BGP sessions in FRR daemon
-cluster1$ show bgp summary
-
-# verify running config of FRR daemon
-cluster1$ show run
-
-# check HTTP echo service
-docker exec -it client4 curl 2.2.2.100
-Server address: 10.244.0.3:80
-Server name: nginxhello-6b97fd8857-4vp6z
-Date: 10/Aug/2023:09:06:01 +0000
-URI: /
-Request ID: f84edead22027f72b2dc951fbfe96b4f
-
-# check HTTP echo service once again
-docker exec -it client4 curl 1.1.1.100
-Server address: 10.244.2.3:80
-Server name: nginxhello-6b97fd8857-b2vf8
-Date: 10/Aug/2023:09:06:03 +0000
-URI: /
-Request ID: f03d053c39bd725519e86fa5b588f7f6
-
-# requests are load balanced to different pods
+```bash
+# test that measures the time that the network takes to react to a decrease in the number of pods
+python3 c_del.py
 ```
 
 ## Delete the lab
