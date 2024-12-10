@@ -1,6 +1,6 @@
 # Nokia SR Linux agent to implement Kubernetes aware load balancing in data centers
 
-This repository contains the implementation of the method of load balancing for data centers presented in the master thesis “SR Linux agent for Kubernetes load balancing on data center fabrics” from João Carvalheiro.
+This repository contains the implementation of the method of load balancing for data centers presented in the master thesis “SR Linux agent for Kubernetes load balancing on data center fabrics” from João Carvalheiro. The mechanism proposed monitors the Kubernetes clusters and updates the configuration of the network making the load balancing within a data center fabric optimized even if the cluster changes
 
 This contains the code of the SR Linux agent and the setup files for the lab environment where it was tested.
 
@@ -13,7 +13,7 @@ The following diagram represents the physical and logical topology.
 ## Topology
 
 <p align="center">
- <img src="images/LabTop.png" width="900">
+ <img src="images/TestTop.png" width="900">
 </p>
 
 ## Goal
